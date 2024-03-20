@@ -1,0 +1,29 @@
+################## Pega dados do email ###########################
+#
+:local email "EMAIL A SER ENVIADO";
+:local serversmtp "SMTP SERVER";
+:local user "USER@EMAIL";
+:local senha "SENHA";
+:local msg "Para restaurar este Backup faça download do arquivo copie para pasta file do mikrotik e em seguida clique em no boto restaure e aguarde a reinicializao do mikrotik.";
+:local port "PORTA SMTP";
+#
+################################################################
+:local name [/system identity get name]
+
+#
+:local data [/system clock get date]
+
+:local hora [/system clock get time]
+
+#
+/system backup save name="$name"
+/export file="$name.rsc";
+:delay 05
+:log info "enviando backup por email"
+
+/
+/tool e-mail send to="$email" from="$user" subject="Backup do $name data $data hora $hora" body="$msg" tls=starttls port="$port" server="$serversmtp" user="$user" password="$senha" file="$name.rsc,$name.backup"
+#
+:delay 5;
+/file remove "$name.rsc,$name.backup"
+:log info "backup concluido"
